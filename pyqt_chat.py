@@ -4,6 +4,8 @@ DEBUG = False
 
 from PySide6.QtCore import *
 from PySide6.QtWidgets import *
+from PySide6.QtGui import *
+
 
 # you may have to run `pip install -q -U google-genai` to install google's genai client
 from google import genai
@@ -28,6 +30,11 @@ Try not to frustrate students even if you cannot solve the problem for them to p
 Be straight to the point. Do not ramble on and on in responses. 
 
 If students need help with their logic of a program or concept, walk through an example problem and how they should approach solving it. 
+
+Try to be straight and to the point as much as possible. 
+
+Do not ask students questions but try to answer their questions.
+
 """
 
 dotenv.load_dotenv()
@@ -36,18 +43,44 @@ client = genai.Client()
 
 # GUI:
 app = QApplication([])
+title = QLabel("Shai Bot")
+title.setFont(QFont('Arial', 30))
+title.setAlignment(Qt.AlignCenter)
+text_title = QLabel("Ask Your Question Below")
+text_title.setFont(QFont('Arial', 18))
+text_title.setAlignment(Qt.AlignCenter)
 text_area = QPlainTextEdit()
 text_area.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+text_area.setFont(QFont('Arial', 18))
+text_area.setMinimumWidth(1300)
+text_area.setStyleSheet("""
+background-color: #303234;
+color: #FAF9F6;                    
+""")
 message = QLineEdit()
+message.setFont(QFont('Arial', 18))
+message.setStyleSheet("""
+background-color: #303234;
+color: #FAF9F6;                    
+""")
 layout = QVBoxLayout()
-layout.addWidget(text_area)
+layout.addWidget(title, alignment=Qt.AlignmentFlag.AlignHCenter)
+layout.addWidget(text_area, alignment=Qt.AlignmentFlag.AlignHCenter)
 layout.addWidget(message)
 window = QWidget()
 window.setLayout(layout)
-window.resize(600,400)
+window.setStyleSheet("""
+background-color: #000000""")
+window.resize(1000,800)
 window.show()
 
 chat_history = ''
+
+start_chat = "Greetings! I'm Shai Bot, I'm here to help you with your computer science related questions. I cannot give you direct answers, but I can guide you through solving the problems"
+
+text_area.appendPlainText('\nShai Bot: ' + start_chat + '\n')
+
+chat_history = start_chat
 
 def query_and_retry(prompt):
     try:
@@ -57,7 +90,7 @@ def query_and_retry(prompt):
         )
         return response
     except Exception as e:
-        text_area.appendPlainText(str(type(e)) + '\n' + e + '\nRetrying...')
+        text_area.appendPlainText(str(type(e)) + '\n' + str(e) + '\nRetrying...')
         time.sleep(1)
         return query_and_retry(prompt)
 
@@ -82,7 +115,7 @@ def send_message():
         response_text = response.text
   
     
-    text_area.appendPlainText('AI: ' + response_text + '\n')
+    text_area.appendPlainText('Shai Bot: ' + response_text + '\n')
 
 
     chat_history += user_prompt + '\n' + response_text  
